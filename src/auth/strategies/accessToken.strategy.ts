@@ -13,7 +13,7 @@ export class AccessTokenStrategy extends PassportStrategy(Strategy, 'jwt-access'
         });
     }
 
-    validate(user: User) {
+    private validate(user: User) {
         return {email: user.email, id: user.id, roles: user.roles}
     }
 

@@ -15,7 +15,7 @@ export class RefreshTokenStrategy extends PassportStrategy(Strategy, 'jwt-refres
         });
     }
 
-    validate(req: Request, payload: any) {
+    private validate(req: Request, payload: any) {
         const refreshToken = req.headers.authorization?.replace('Bearer', '').trim()
         if(!refreshToken) {
             throw new UnauthorizedException('Invalid Token')

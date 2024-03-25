@@ -5,6 +5,7 @@ import {RoleService} from "@/role/role.service";
 import {Role} from "@/role/role.model";
 import {UserRoles} from "@/user-roles/user-roles.model";
 import {UserDto} from "@/users/dto/user.dto";
+import {UpdateUserDto} from "@/users/dto/update-user.dto";
 
 @Injectable()
 export class UsersService {
@@ -15,6 +16,7 @@ export class UsersService {
         const user = await this.userRepository.create(dto)
         const role = await this.roleService.getRoleByValue("ROLE_READER")
         await user.$set('roles', [role.id])
+        user.roles = [role]
         return user
     }
     async getUsers(){
@@ -42,7 +44,7 @@ export class UsersService {
         return await this.userRepository.findOne({where: {email}, include: {all: true}})
     }
 
-    async updateUser(id: number, updateUserDto: UserDto) {
+    async updateUser(id: number, updateUserDto: UpdateUserDto) {
         const user = await this.getUserById(id)
         if(!user) {
             throw new NotFoundException(`Пользователь с ${id} не найден`)

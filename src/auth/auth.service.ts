@@ -4,6 +4,8 @@ import {JwtService} from "@nestjs/jwt";
 import {UserDto} from "@/users/dto/user.dto";
 import * as bcrypt from "bcryptjs";
 import {ConfigService} from "@nestjs/config";
+import {User} from "@/users/users.model";
+import {Role} from "@/role/role.model";
 
 @Injectable()
 export class AuthService {
@@ -22,22 +24,25 @@ export class AuthService {
         }
         const hashPassword = await bcrypt.hash(userDto.password, 5)
         const user = await this.userService.createUser({...userDto, password: hashPassword})
-        const tokens = await this.getTokens(user.id, user.email)
-
+        const tokens = await this.getTokens(user.id, user.email, user.roles)
+        await this.updateRefreshToken(user.id, tokens.refreshToken)
+        return tokens;
 
     }
 
     async updateRefreshToken(userId: number, refreshToken: string) {
         const hashedRefreshToken = await bcrypt.hash(refreshToken, 5)
+        await this.userService.updateUser(userId, {refreshToken: hashedRefreshToken})
 
     }
 
-    async getTokens(userId: number, email: string) {
+    async getTokens(userId: number, email: string, userRoles: Role[]) {
         const [accessToken, refreshToken] = await Promise.all([
             this.JwtService.signAsync(
                 {
                     id: userId,
-                    email: email
+                    email: email,
+                    roles: userRoles,
                 },
                 {
                     secret: this.configService.get(<string>("JWT_ACCESS_TOKEN")),
@@ -47,11 +52,12 @@ export class AuthService {
             this.JwtService.signAsync(
                 {
                     id: userId,
-                    email: email
+                    email: email,
+                    roles: userRoles
                 },
                 {
                     secret: this.configService.get<string>("JWT_REFRESH_TOKEN"),
-                    expiresIn: '7d'
+                    expiresIn: '30d'
                 }
             )
         ])

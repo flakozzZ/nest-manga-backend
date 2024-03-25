@@ -1,6 +1,7 @@
 import {Body, Controller, HttpException, Post} from '@nestjs/common';
 import {ApiTags} from "@nestjs/swagger";
 import {AuthService} from "@/auth/auth.service";
+import {UserDto} from "@/users/dto/user.dto";
 
 
 
@@ -15,7 +16,7 @@ export class AuthController {
     }
 
     @Post("/register")
-    register() {
-
+    register(@Body() userDto: UserDto) {
+        return this.authService.registration(userDto)
     }
 }
