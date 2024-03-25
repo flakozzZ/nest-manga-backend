@@ -11,8 +11,8 @@ export class AuthController {
     constructor(private authService: AuthService) {}
 
     @Post('/login')
-    login(){
-
+    login(@Body() userDto: UserDto){
+        return this.authService.login(userDto)
     }
 
     @Post("/register")

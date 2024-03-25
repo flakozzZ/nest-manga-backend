@@ -1,4 +1,4 @@
-import {HttpException, HttpStatus, Injectable} from "@nestjs/common";
+import {HttpException, HttpStatus, Injectable, UnauthorizedException} from "@nestjs/common";
 import {UsersService} from "@/users/users.service";
 import {JwtService} from "@nestjs/jwt";
 import {UserDto} from "@/users/dto/user.dto";
@@ -14,7 +14,19 @@ export class AuthService {
                 private configService: ConfigService) {
     }
 
-    async login() {
+    async login(userDto: UserDto) {
+        const user = await this.userService.getUserByEmail(userDto.email);
+        if (!user) {
+            throw new UnauthorizedException({ message: "Неверный логин или пароль" });
+        }
+        const passwordMatch = await bcrypt.compare(userDto.password, user.password);
+        if (!passwordMatch) {
+            throw new UnauthorizedException({ message: "Неверный логин или пароль" });
+        }
+        const tokens = await this.getTokens(user.id, user.email, user.roles);
+        await this.updateRefreshToken(user.id, tokens.refreshToken);
+
+        return tokens;
     }
 
     async registration(userDto: UserDto) {
