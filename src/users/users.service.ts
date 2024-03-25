@@ -1,9 +1,10 @@
-import {Injectable, NotFoundException} from '@nestjs/common';
+import {BadRequestException, HttpException, Injectable, NotFoundException} from '@nestjs/common';
 import {InjectModel} from "@nestjs/sequelize";
 import {User} from "@/users/users.model";
 import {RoleService} from "@/role/role.service";
 import {Role} from "@/role/role.model";
 import {UserRoles} from "@/user-roles/user-roles.model";
+import {UserDto} from "@/users/dto/user.dto";
 
 @Injectable()
 export class UsersService {
@@ -27,17 +28,17 @@ export class UsersService {
     }
 
     async getUserById(id: number) {
-        const userId =  await this.userRepository.findByPk(id, {include: {
-                model: Role,
-                as: 'roles',
-                through: {
-                    attributes: []
-                }
-            }});
-        if(!userId) {
-            throw new Error(`User with ${userId} not found`)
-        }
-        return userId;
+            return await this.userRepository.findByPk(id, {include: {
+                    model: Role,
+                    as: 'roles',
+                    through: {
+                        attributes: []
+                    }
+                }});
     }
 
+
+    async getUserByEmail(email: string) {
+        return await this.userRepository.findOne({where: {email}, include: {all: true}})
+    }
 }

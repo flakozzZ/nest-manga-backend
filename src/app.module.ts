@@ -7,10 +7,14 @@ import { RoleModule } from './role/role.module';
 import * as process from "process";
 import {Role} from "@/role/role.model";
 import {UserRoles} from "@/user-roles/user-roles.model";
+import { AuthController } from './auth/auth.controller';
+import { AuthService } from './auth/auth.service';
+import { AuthModule } from './auth/auth.module';
+import {JwtModule} from "@nestjs/jwt";
 
 @Module({
-    controllers: [],
-    providers: [],
+    controllers: [AuthController],
+    providers: [AuthService],
     imports: [
         ConfigModule.forRoot({
             envFilePath: `.${process.env.NODE_ENV}.env`
@@ -27,6 +31,7 @@ import {UserRoles} from "@/user-roles/user-roles.model";
         }),
         UsersModule,
         RoleModule,
+        AuthModule,
     ],
 })
 export class AppModule {
