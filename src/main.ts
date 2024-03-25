@@ -7,8 +7,7 @@ import {DocumentBuilder, SwaggerModule} from "@nestjs/swagger";
 
 const start = async () => {
     const PORT = process.env.PORT;
-    const app = await NestFactory.create(AppModule)
-
+    const app = await NestFactory.create(AppModule, {cors: true})
     const config = new DocumentBuilder()
         .setTitle("Nest Backend")
         .setDescription("Manga Backend")

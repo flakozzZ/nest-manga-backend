@@ -6,4 +6,6 @@ export class UserDto {
 
     @ApiProperty({example: "password"})
     readonly password: string
+
+    readonly refreshToken?: string
 }
